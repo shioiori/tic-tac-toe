@@ -1,36 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="">
+  <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <section id="main-content">
-        <div>
-            <div>
-                <div>level dropdown</div>
-                <div>set size</div>    
-            </div>
-            <div style="text-align: center;">
-                <div style="display: flex; gap: .5rem; justify-content: center;">
-                    <div class="player-button"><svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" aria-label="X" role="img" viewBox="0 0 128 128" width="128" height="128"><path class="hFJ9Ve" d="M16,16L112,112" stroke="#000000" fill="none" stroke-width="16px"></path><path class="hFJ9Ve" d="M112,16L16,112" stroke="#000000" fill="none" stroke-width="16px"></path></svg></div>
-                    <div class="player-button"><svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" jsname="D7yUae" aria-label="O" role="img" viewBox="0 0 128 128" width="128" height="128"><path class="hFJ9Ve" d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16" stroke="#000000" fill="none" stroke-width="16px"></path></svg></div>    
-                </div>
-                <p class="current-status">Start game or select player</p>
-            </div>
-            <div>
-            <div class="caro-zone">
-                <table class="grid-container">
-
-                </table>
-            </div>
-        </div>
-            <div>
-                <button class="btn-restart" onclick="restartGame()">Restart game</button>
-            </div>
-    </section>
-    <script src="script.js"></script>
-</body>
-</html> 
+    <title>Vite App</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
