@@ -5,9 +5,10 @@ export const Players = Object.freeze({
 
 export const Result = Object.freeze({
   NotStart: -1,
-  Lose: 0,
-  Win: 1,
-  InGame: 2,
+  XWin: 0,
+  OWin: 1,
+  Draw: 2,
+  InGame: 3,
 });
 
 export const Level = Object.freeze({

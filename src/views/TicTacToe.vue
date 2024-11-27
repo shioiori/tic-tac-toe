@@ -1,12 +1,14 @@
 <template lang="">
-  <div class="w-2/5 mx-auto border border-gray-300 rounded-md">
-    <SettingBar/>
-    <StatusBoard/>
-    <div>
-      <GridTable/>
-    </div>
-    <div>
-      <RestartButton/>
+  <div class="flex h-screen items-center">
+    <div class="w-2/5 mx-auto border border-gray-300 rounded-lg">
+      <SettingBar/>
+      <StatusBoard/>
+      <div>
+        <GridTable/>
+      </div>
+      <div>
+        <RestartButton/>
+      </div>
     </div>
   </div>
 </template>
