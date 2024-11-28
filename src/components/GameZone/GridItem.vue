@@ -4,7 +4,7 @@ import { useGameStore } from '@/stores/state';
 import IconX from '../icons/IconX.vue';
 import IconO from '../icons/IconO.vue';
 import { emitter } from '@/eventbus/mitt';
-import { Result } from '@/constants/enums';
+import { Level, Players, Result } from '@/constants/enums';
 import { Color } from '@/constants/color';
 
 const store = useGameStore();
@@ -20,7 +20,7 @@ const tickMark = () => {
   if (store.endGame) return;
   if (!store.validMove(props.row, props.column)) return;
   store.tickMark(props.row, props.column);
-  const IconComponent = h(store.isXPlayer ? IconX : IconO, { size: store.iconTickSize, stroke: store.isXPlayer ? Color.LightGray : Color.LightYellow });
+  const IconComponent = getIcon();
   if (tickMarkContainer.value){
     render(IconComponent, tickMarkContainer.value)
   }
@@ -28,6 +28,17 @@ const tickMark = () => {
   emitter.emit('updateTurn');
   if (store.result == Result.InGame)
   store.switchPlayer();
+  if (store.level != Level.PlayAgainstAFriend && store.you != store.currentPlayer){
+    let [row, column] = store.aiMove();
+    emit('aiMove', row, column);
+    store.switchPlayer();
+  }
+}
+
+const emit = defineEmits(['aiMove']);
+
+const getIcon = () => {
+  return h(store.currentPlayer == Players.X ? IconX : IconO, { size: store.iconTickSize, stroke: store.isXPlayer ? Color.LightGray : Color.LightYellow });
 }
 
 onMounted(() => {

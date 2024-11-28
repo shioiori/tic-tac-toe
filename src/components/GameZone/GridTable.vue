@@ -2,7 +2,7 @@
 import { useGameStore } from '@/stores/state';
 import GridItem from './GridItem.vue';
 import { onMounted } from 'vue';
-import { randomString } from '@/utils/random';
+import { randomString } from '@/common/random';
 import { emitter } from '@/eventbus/mitt';
 import { ref } from 'vue';
 
@@ -25,6 +25,15 @@ emitter.on("refreshBoard", () => {
   renderKey.value = randomString(6);
   gridClass.value = `grid-cols-` + store.size + ` w-` + store.size * store.gridSize + ` h-` + store.size * store.gridSize;
 });
+
+const gridRefs = ref([]);
+const aiMove = (row, column) => {
+  const gridItem = gridRefs[row * store.size + column + 1];
+  if (gridItem) {
+    gridItem.tickMark();
+  }
+}
+
 </script>
 <template lang="">
   <div class="w-full bg-teal-500 flex items-center justify-center py-6 px-48" :key="renderKey">
@@ -32,7 +41,9 @@ emitter.on("refreshBoard", () => {
       <GridItem v-for="item in (store.size * store.size)"
         :key="item"
         :row="calculateRow(item - 1)"
-        :column="calculateColumn(item - 1)"/> <!-- v-for is 1-indexed -->
+        :column="calculateColumn(item - 1)"
+        :ref="el => (gridRefs[item] = el)"
+        @aiMove="aiMove"/><!-- v-for is 1-indexed -->
     </div>
   </div>
 </template>
