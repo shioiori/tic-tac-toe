@@ -9,5 +9,5 @@ const restartGame = () => {
 </script>
 
 <template lang="">
-  <button class="bg-none text-green-800 border-t-gray-300 font-bold w-full py-1.5" @click="restartGame">Restart game</button>
+  <button class="bg-none text-teal-600 border-t-gray-300 font-bold w-full py-1.5" @click="restartGame">Restart game</button>
 </template>

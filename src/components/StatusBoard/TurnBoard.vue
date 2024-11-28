@@ -1,27 +1,28 @@
 <script setup>
 import { useGameStore } from '@/stores/state';
 import { h, ref, render } from 'vue';
-import IconX from '../icons/IconX.vue';
-import IconO from '../icons/IconO.vue';
+import IconX from '../../assets/X.svg?raw';
+import IconO from '../../assets/O.svg?raw';
 import { emitter } from '@/eventbus/mitt';
-import { Result } from 'postcss';
+import { Color } from '@/constants/color';
+import { Result } from '@/constants/enums';
 
-const statusContent = ref(null);
-const gameState = useGameStore();
-emitter.on("updateStatus", () => {
-  if (gameState.result == Result.NotStart){
+const statusContent = ref("Start game or select player");
+const store = useGameStore();
+emitter.on("updateTurn", () => {
+  if (store.result == Result.NotStart){
     statusContent.value = "Start game or select player";
     return;
   }
-  if (gameState.result != Result.InGame){
+  if (store.result != Result.InGame){
     statusContent.value = "Game Over";
     return;
   }
-  const IconComponent = h(gameState.isXPlayer ? IconX : IconO, { size: gameState.iconTickSize });
+  const IconComponent = h('svg', store.isXPlayer ? IconX : IconO);
   if (statusContent.value){
     render(IconComponent, statusContent.value)
   }
-  const text = h('span', "turn");
+  const text = h('span', " turn");
   if (statusContent.value){
     render(text, statusContent.value)
   }
@@ -30,6 +31,5 @@ emitter.on("updateStatus", () => {
 </script>
 <template lang="">
   <p ref="statusContent" class="text-center my-3 text-sm">
-    Start game or select player
   </p>
 </template>

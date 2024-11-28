@@ -1,6 +1,6 @@
 <template lang="">
   <div class="flex h-screen items-center">
-    <div class="w-2/5 mx-auto border border-gray-300 rounded-lg">
+    <div class="mx-auto border border-gray-300 rounded-lg max-w-full">
       <SettingBar/>
       <StatusBoard/>
       <div>

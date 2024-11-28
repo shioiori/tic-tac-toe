@@ -12,8 +12,8 @@ export const Result = Object.freeze({
 });
 
 export const Level = Object.freeze({
-  Easy: 0,
-  Medium: 1,
-  Impossible: 2,
-  PlayAgainstAFriend: -1,
+  Easy: "Easy",
+  Medium: "Medium",
+  Impossible: "Impossible",
+  PlayAgainstAFriend: "Play Against A Friend",
 });

@@ -15,6 +15,7 @@ export const useGameStore = defineStore('game', {
       currentPlayer: Players.X,
       result: Result.NotStart,
       size: 3,
+      gridSize: 20,
       iconTickSize: 48,
       iconStatusSize: 16,
       iconAlertSize: 48,
@@ -35,7 +36,7 @@ export const useGameStore = defineStore('game', {
     },
     changePlayer(player){
       if (this.result == Result.NotStart){
-        this.currentPlayer = player;
+        this.you = player;
       }
     },
     checkResult(){
@@ -98,6 +99,33 @@ export const useGameStore = defineStore('game', {
       this.grid = Array.from({ length: this.size }, () => Array(this.size).fill(null));
       this.result = Result.NotStart;
       this.emptyCell = this.size * this.size;
+      this.currentPlayer = Players.X;
+    },
+    setLevel(level){
+      this.level = level;
+    },
+    setSize(size){
+      this.size = size;
+      switch (size){
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+          this.gridSize = 20;
+          this.iconTickSize = 48;
+          break;
+        case 7:
+        case 8:
+        case 9:
+          this.gridSize = 16;
+          this.iconTickSize = 42;
+          break;
+        default:
+          this.gridSize = 12;
+          this.iconTickSize = 30;
+          break;
+      }
     }
   }
 })
