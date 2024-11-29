@@ -8,7 +8,7 @@ const handleInputChange = (e) => {
   store.setSize(parseInt(e.target.value));
   setTimeout(() => {
     emitter.emit("refreshBoard");
-  }, 500);
+  }, store.animationDelayTime);
 }
 </script>
 

@@ -21,10 +21,10 @@ export class CaroAI{
         move = emptySpots[Math.floor(Math.random() * emptySpots.length)];
         break;
       case Level.Medium:
-        move = this.findBestMove(grid, 2);
+        move = this.findBestMove(grid, 4);
         break;
       case Level.Impossible:
-        move = this.findBestMove(grid, 4);
+        move = this.findBestMove(grid, 10);
         break;
     }
     console.log(move);

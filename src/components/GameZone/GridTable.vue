@@ -28,7 +28,7 @@ emitter.on("refreshBoard", () => {
 
 const gridRefs = ref([]);
 const aiMove = (row, column) => {
-  const gridItem = gridRefs[row * store.size + column + 1];
+  const gridItem = gridRefs.value[row * store.size + column + 1];
   if (gridItem) {
     gridItem.tickMark();
   }

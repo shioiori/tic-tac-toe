@@ -7,16 +7,15 @@ import { storeToRefs } from 'pinia';
 import { ref, watch } from 'vue';
 import { onMounted } from 'vue';
 import { Color } from '@/constants/color';
-const highlightClass = `border-b-2 border-b-green-800 shadow-lg`
+
+const highlightClass = `border-b-2 border-b-teal-500 shadow-lg`
 const currentState = ref(null);
 const props = defineProps({
   player: Number
 })
 
 const store = useGameStore();
-const { xWinMatch, oWinMatch, currentPlayer } = storeToRefs(store);
-watch(xWinMatch, () => store.xWinMatch > 0 ? store.xWinMatch : "-");
-watch(oWinMatch, () => store.oWinMatch > 0 ? store.oWinMatch : "-");
+const { currentPlayer } = storeToRefs(store);
 watch(currentPlayer, () => {
   setHighlight();
 })
@@ -25,6 +24,7 @@ onMounted(() => {
 });
 
 const setHighlight = () => {
+  if (store.endGame) currentState.value = ``;
   if (store.currentPlayer == props.player){
     currentState.value = highlightClass;
   }
@@ -42,7 +42,7 @@ const setHighlight = () => {
       <IconO :size="store.iconStatusSize" :stroke="Color.Black" v-else />
     </div>
     <div>
-      <h3 class="font-bold">{{props.player == Players.X ? xWinMatch : oWinMatch}}</h3>
+      <h3 class="font-bold">{{props.player == Players.X ? (store.xWinMatch > 0 ? store.xWinMatch : "-") : (store.oWinMatch > 0 ? store.oWinMatch : "-")}}</h3>
     </div>
   </div>
 

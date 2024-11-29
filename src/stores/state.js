@@ -17,13 +17,16 @@ export const useGameStore = defineStore('game', {
       iconAlertSize: 48,
       xWinMatch: 0,
       oWinMatch: 0,
-      ai: null
+      ai: null,
+      tickAnimationDelayTime: 200,
+      gridAnimationDelayTime: 2000
     }
   },
   getters: {
     isXPlayer: (state) => state.currentPlayer == Players.X,
     endGame: (state) => state.result == Result.OWin || state.result == Result.XWin || state.result == Result.Draw,
     size: (state) => state.game.size,
+    aiTurn: (state) => state.you != state.currentPlayer
   },
   actions: {
     switchPlayer(){
@@ -36,6 +39,10 @@ export const useGameStore = defineStore('game', {
     },
     checkResult(){
       this.result = this.game.checkResult(this.currentPlayer);
+      if (this.endGame){
+        if (this.result == Result.OWin) this.oWinMatch++;
+        else if (this.result == Result.XWin) this.xWinMatch++;
+      }
     },
     tickMark(row, column){
       this.game.grid[row][column] = this.currentPlayer;
@@ -50,6 +57,7 @@ export const useGameStore = defineStore('game', {
       if (this.level != Level.PlayAgainstAFriend){
         this.ai = new CaroAI(this.game, this.level, this.you == Players.X ? Players.O : Players.X);
       }
+      this.result = Result.NotStart;
     },
     setLevel(level){
       this.level = level;

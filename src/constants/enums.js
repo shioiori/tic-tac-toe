@@ -17,3 +17,15 @@ export const Level = Object.freeze({
   Impossible: "Impossible",
   PlayAgainstAFriend: "Play Against A Friend",
 });
+
+export const AnimationPosition = Object.freeze({
+  TopLeft: 0,
+  TopRight: 1,
+  BottomLeft: 2,
+  BottomRight: 3,
+  Top: 4,
+  Bottom: 5,
+  Left: 6,
+  Right: 7,
+  Center: 8
+});

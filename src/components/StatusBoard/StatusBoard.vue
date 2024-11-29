@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Players } from '@/constants/enums';
 import PlayerState from './PlayerState.vue';
-import TurnBoard from './TurnBoard.vue';
+import TurnBoard from './TurnStatus.vue';
 </script>
 
 <template>
