@@ -11,9 +11,11 @@ export class CaroGame{
   constructor(size){
     this.size = size;
     this.init();
+    this.winLine = [];
   }
 
   checkResult(player){
+    if (this.emptyCell == 0) return Result.Draw;
     for (let i = 0; i < this.size; ++i){
       for (let j = 0; j < this.size; ++j){
         if (this.grid[i][j] == player){
@@ -25,11 +27,11 @@ export class CaroGame{
         }
       }
     }
-    if (this.emptyCell == 0) return Result.Draw;
     return Result.InGame;
   }
 
   hasWinCondition(row, col, player){
+    this.winLine.push({row: row, col: col});
     let condition = this.size < 5 ? this.size : 5;
     for (const { dr, dc } of directions) {
       let count = 1;
@@ -41,6 +43,7 @@ export class CaroGame{
           this.grid[nRow][nCol] != player) {
           break;
         }
+        this.winLine.push({row: nRow, col: nCol});
         count++;
       }
       for (let i = 1; i < condition; i++) {
@@ -51,11 +54,19 @@ export class CaroGame{
           this.grid[nRow][nCol] != player) {
           break;
         }
+        this.winLine.push({row: nRow, col: nCol});
         count++;
       }
       if (count >= condition) return true;
+      else this.winLine = [];
     }
+    this.winLine = [];
     return false;
+  }
+
+  move(row, column, player){
+    this.grid[row][column] = player;
+    this.emptyCell --;
   }
 
   validMove(row, column){

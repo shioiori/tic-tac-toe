@@ -16,15 +16,16 @@ export class CaroAI{
     }
 
     let move;
+    let gridClone = JSON.parse(JSON.stringify(grid));
     switch (this.level) {
       case Level.Easy:
         move = emptySpots[Math.floor(Math.random() * emptySpots.length)];
         break;
       case Level.Medium:
-        move = this.findBestMove(grid, 4);
+        move = this.findBestMove(gridClone, 4);
         break;
       case Level.Impossible:
-        move = this.findBestMove(grid, 10);
+        move = this.findBestMove(gridClone, 10);
         break;
     }
     console.log(move);

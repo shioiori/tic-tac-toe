@@ -11,13 +11,14 @@ const svgContainer = ref(null);
 const textMessage = ref("Start game or select player");
 const store = useGameStore();
 emitter.on("updateTurn", () => {
+  if (store.result != Result.InGame){
+    svgContainer.value.innerHTML = ``;
+  }
   if (store.result == Result.NotStart){
     textMessage.value = "Start game or select player";
     return;
   }
-  if (store.result != Result.InGame){
-    // fix soon
-    svgContainer.value.innerHTML = ``;
+  if (store.endGame){
     textMessage.value = "Game Over";
     return;
   }

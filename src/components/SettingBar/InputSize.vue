@@ -5,16 +5,18 @@ import { useGameStore } from '@/stores/state';
 
 const store = useGameStore();
 const handleInputChange = (e) => {
-  store.setSize(parseInt(e.target.value));
-  setTimeout(() => {
-    emitter.emit("refreshBoard");
-  }, store.animationDelayTime);
+  let size = parseInt(e.target.value);
+  if (size < 3 || isNaN(size)) {
+    size = 3;
+  }
+  store.setSize(size);
+  emitter.emit("refreshBoard");
 }
 </script>
 
 <template>
   <input type="number" class="border border-grey-300 w-8 h-8 rounded-lg my-2 bg-transparent text-center transition duration-300 ease focus:outline-none focus:border-slate-300 hover:border-slate-300 shadow-sm focus:shadow"
-    @input="handleInputChange" v-model="store.size">
+  :value="store.size" @blur="handleInputChange">
 </template>
 
 <style>

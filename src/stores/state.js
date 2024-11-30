@@ -19,14 +19,16 @@ export const useGameStore = defineStore('game', {
       oWinMatch: 0,
       ai: null,
       tickAnimationDelayTime: 200,
-      gridAnimationDelayTime: 2000
+      gridAnimationDelayTime: 200,
+      victoryAnimationDelayTime: 2000,
     }
   },
   getters: {
     isXPlayer: (state) => state.currentPlayer == Players.X,
     endGame: (state) => state.result == Result.OWin || state.result == Result.XWin || state.result == Result.Draw,
     size: (state) => state.game.size,
-    aiTurn: (state) => state.you != state.currentPlayer
+    aiTurn: (state) => state.level != Level.PlayAgainstAFriend && state.you != state.currentPlayer,
+    playWithAI: (state) => state.level != Level.PlayAgainstAFriend,
   },
   actions: {
     switchPlayer(){
@@ -45,19 +47,26 @@ export const useGameStore = defineStore('game', {
       }
     },
     tickMark(row, column){
-      this.game.grid[row][column] = this.currentPlayer;
+      this.game.move(row, column, this.currentPlayer);
       if (this.result == Result.NotStart) this.result == Result.InGame;
-      this.emptyCell--;
     },
     validMove(row, column){
       return this.game.validMove(row, column);
     },
     refreshBoardGame(){
       this.game.refreshBoardGame();
-      if (this.level != Level.PlayAgainstAFriend){
+      if (this.playWithAI){
         this.ai = new CaroAI(this.game, this.level, this.you == Players.X ? Players.O : Players.X);
       }
-      this.result = Result.NotStart;
+      // X always goes first
+      this.currentPlayer = Players.X;
+      // If you are X, you can start a game by go first or change to O and let AI go first
+      if (this.aiTurn){
+        this.result = Result.InGame;
+      }
+      else {
+        this.result = Result.NotStart;
+      }
     },
     setLevel(level){
       this.level = level;
@@ -87,8 +96,13 @@ export const useGameStore = defineStore('game', {
     },
     aiMove(){
       let [row, column] = this.ai.aiMove(this.game.grid);
-      this.tickMark(row, column);
       return [row, column];
+    },
+    getWinLine(){
+      if (this.endGame && this.result != Result.Draw){
+        return this.game.winLine;
+      }
+      return [];
     }
   }
 })
