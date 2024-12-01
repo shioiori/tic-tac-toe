@@ -80,7 +80,7 @@ export const useGameStore = defineStore('game', {
         case 4:
           this.gridSize = 20;
           this.iconTickSize = 48;
-          this.gridStroke = 8;
+          this.gridStroke = 4;
           break;
         case 5:
         case 6:

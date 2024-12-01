@@ -3,8 +3,8 @@
     <div :class="[`flex justify-center items-center `, divSizeClass]" ref="noticeContainer">
 
       <div class="flex items-center justify-center" ref="iconContainer">
-        <IconX v-if="store.currentPlayer == Players.X" :size="store.iconTickSize" :stroke="Color.LightGray"/>
-        <IconO :size="store.iconTickSize" :stroke="Color.LightYellow" v-else/>
+        <IconX v-if="store.result != Result.OWin" :size="store.iconTickSize" :stroke="Color.LightGray"/>
+        <IconO v-if="store.result != Result.XWin" :size="store.iconTickSize" :stroke="Color.LightYellow"/>
       </div>
       <div
         ref="winnerText"
@@ -31,9 +31,6 @@ const winnerText = ref(null)
 const winnerMessage = ref('')
 const divSizeClass = ref('');
 const noticeContainer = ref(null);
-const props = defineProps({
-  startPosition: Object
-})
 
 const animateVictory = () => {
   winnerMessage.value = store.result == Result.Draw ? "DRAW!" : "WINNER!";
@@ -58,9 +55,6 @@ const animateVictory = () => {
 }
 
 onMounted(() => {
-  console.log(props.startPosition);
-  console.log(iconContainer.value.getBoundingClientRect());
-
   divSizeClass.value = `w-` + store.size * store.gridSize + ` h-` + store.size * store.gridSize;
   winnerText.value.style.transform = `translateY(6.5rem)`;
   animateVictory();

@@ -56,10 +56,12 @@ const boardDisable = (disabled) => disablePointerEvent.value = disabled;
 const hasWinner = ref(false);
 const victoryShow = ref(false);
 const victoryNotify = async() => {
-  hasWinner.value = true;
-  winningCoordinates.value = calculateWinningLineCoordinates();
-  await nextTick();
-  await animateVictory();
+  if (store.result != Result.Draw){
+    hasWinner.value = true;
+    winningCoordinates.value = calculateWinningLineCoordinates();
+    await nextTick();
+    await animateVictory();
+  }
   victoryShow.value = true;
 }
 
@@ -281,7 +283,6 @@ const animateGroupingMark = () => {
       v-if="victoryShow"
       class="w-full bg-teal-500"
       @refreshBoard="refreshBoard"
-      :startPosition="startPosition"
     />
   </div>
 </template>
