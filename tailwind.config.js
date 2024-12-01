@@ -8,6 +8,7 @@ export default {
   safelist: [
     { pattern: /^(w-|h-)/ },
     { pattern: /^grid-cols-/ },
+    { pattern: /^border-(t|r|b|l)-[0-9]+$/ },
   ],
 }
 
