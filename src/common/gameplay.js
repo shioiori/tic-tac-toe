@@ -1,4 +1,4 @@
-import { Direction } from "@/constants/direction";
+import { Direction, getDirection } from "@/constants/direction";
 import { Result, Players } from "@/constants/enums";
 
 export class CaroGame{
@@ -31,8 +31,7 @@ export class CaroGame{
       this.winProof = {
         direction: direction,
       }
-      let dr = direction.dr;
-      let dc = direction.dc;
+      let {dr, dc} = getDirection(direction);
       for (let i = 1; i < condition; i++) {
         const nRow = row + dr * i;
         const nCol = col + dc * i;

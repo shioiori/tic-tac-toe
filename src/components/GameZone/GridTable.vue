@@ -9,7 +9,7 @@ import VictoryOverlay from '../VictoryOverlay.vue';
 import anime from 'animejs';
 import { Result } from '@/constants/enums';
 import { Color } from '@/constants/color';
-import { compare, Direction } from '@/constants/direction';
+import { Direction } from '@/constants/direction';
 const store = useGameStore();
 const calculateRow = (item) => {
   return ~~(item / store.size);
@@ -59,83 +59,104 @@ const victoryNotify = async() => {
   hasWinner.value = true;
   winningCoordinates.value = calculateWinningLineCoordinates();
   await nextTick();
-  await animateVictoryWinningLine();
+  await animateVictory();
   victoryShow.value = true;
 }
 
 const winningCoordinates = ref(null);
-
-// wrong calculation, fix soon
 const calculateWinningLineCoordinates = () => {
   let winProof = store.getWinLine();
   let startRow = winProof.start.row;
   let startColumn = winProof.start.col;
   let endRow = winProof.end.row;
   let endColumn = winProof.end.col;
-  let lineStroke = 8;
-  if (compare(winProof.direction, Direction.Vertical)){
-    return {
-      start: {
-        x: startColumn * (store.gridSize * 8) + store.gridSize + lineStroke * 2,
-        y: startRow * (store.gridSize * 8),
-      },
-      end: {
-        x: endColumn * (store.gridSize * 8) + store.gridSize + lineStroke * 2,
-        y: endRow * (store.gridSize * 8),
+
+  let gridItemSize = 100;
+  switch (winProof.direction){
+    case Direction.Vertical:
+      return {
+        start: {
+          x: (startColumn * gridItemSize) + gridItemSize / 2,
+          y: startRow * gridItemSize,
+        },
+        end: {
+          x: (endColumn * gridItemSize) + gridItemSize / 2,
+          y: (endRow + 1) * gridItemSize,
+        }
       }
-    }
-  }
-  else if (compare(winProof.direction, Direction.Horizontal)){
-    return {
-      start: {
-        x: startColumn * (store.gridSize * 8),
-        y: startRow * (store.gridSize * 8) + store.gridSize / 2,
-      },
-      end: {
-        x: endColumn * (store.gridSize * 8),
-        y: endRow * (store.gridSize * 8) + store.gridSize / 2,
+    case Direction.Horizontal:
+      return {
+        start: {
+          x: startColumn * gridItemSize,
+          y: (startRow * gridItemSize) + gridItemSize / 2,
+        },
+        end: {
+          x: (endColumn + 1) * gridItemSize,
+          y: (endRow * gridItemSize) + gridItemSize / 2,
+        }
       }
-    }
-  }
-  else {
-    return {
-      start: {
-        x: startColumn * (store.gridSize * 8),
-        y: startRow * (store.gridSize * 8),
-      },
-      end: {
-        x: endColumn * (store.gridSize * 8),
-        y: endRow * (store.gridSize * 8),
+    case Direction.DiagonalDownRight:
+      return {
+        start: {
+          x: startColumn * gridItemSize,
+          y: startRow * gridItemSize,
+        },
+        end: {
+          x: (endColumn + 1) * gridItemSize,
+          y: (endRow + 1) * gridItemSize,
+        }
       }
-    }
+    case Direction.DiagonalDownLeft:
+      return {
+        start: {
+          x: (startColumn + 1) * gridItemSize,
+          y: startRow * gridItemSize,
+        },
+        end: {
+          x: endColumn * gridItemSize,
+          y: (endRow + 1) * gridItemSize,
+        }
+      }
   }
 }
+
 const gridTable = ref(null);
-const winningLine = ref(null)
-const animateVictoryWinningLine = async() => {
-  let direction = store.getWinLine().direction;
+const winningLine = ref(null);
+const startPosition = ref(null);
+const animateVictory = async() => {
   const length = Math.sqrt((winningCoordinates.value.start.x - winningCoordinates.value.end.x) * (winningCoordinates.value.start.x - winningCoordinates.value.end.x)
     + (winningCoordinates.value.start.y - winningCoordinates.value.end.y) * (winningCoordinates.value.start.y - winningCoordinates.value.end.y));
   console.log(length);
   return new Promise((resolve) => {
     winningLine.value.style.strokeDasharray = length;
     winningLine.value.style.strokeDashoffset = length;
-
-    let lineValue = calculateWinningLineCoordinates();
-    let centerX = (lineValue.end.x - lineValue.start.x) / 2;
-    let centerY = (lineValue.end.y- lineValue.start.y) / 2;
     // Animate winning line
     var tl = anime.timeline({
-      easing: 'easeInOutQuad',
-      complete: resolve
+      easing: 'easeOutQuad',
+      complete: () => {
+        Promise.all([...animateGroupingMark(),
+          animeteDisappearWinningLine()
+        ]).then(() => {
+          resolve();
+        })
+      }
     });
     tl.add({
       targets: winningLine.value,
       strokeDashoffset: [length, 0],
       duration: store.victoryAnimationDelayTime,
     });
-    if (compare(direction, Direction.Horizontal)){
-      tl.add({
+  });
+}
+
+const animeteDisappearWinningLine = () => {
+  let direction = store.getWinLine().direction;
+  let lineValue = calculateWinningLineCoordinates();
+  let centerX = (lineValue.end.x - lineValue.start.x) / 2;
+  let centerY = (lineValue.end.y- lineValue.start.y) / 2;
+  switch (direction){
+    case Direction.Horizontal:
+      return anime({
         targets: winningLine.value,
         x1: [lineValue.start.x, centerX],
         x2: [lineValue.end.x, centerX],
@@ -143,9 +164,8 @@ const animateVictoryWinningLine = async() => {
         y2: [lineValue.end.y, lineValue.end.y],
         duration: store.victoryAnimationDelayTime,
       });
-    }
-    else if (compare(direction, Direction.Vertical)){
-      tl.add({
+    case Direction.Vertical:
+      return anime({
         targets: winningLine.value,
         x1: [lineValue.start.x, lineValue.start.x],
         x2: [lineValue.end.x, lineValue.end.x],
@@ -153,9 +173,8 @@ const animateVictoryWinningLine = async() => {
         y2: [lineValue.end.y, centerY],
         duration: store.victoryAnimationDelayTime,
       });
-    }
-    else {
-      tl.add({
+    case Direction.DiagonalDownRight:
+      return anime({
         targets: winningLine.value,
         x1: [lineValue.start.x, centerX],
         x2: [lineValue.end.x, centerX],
@@ -163,84 +182,71 @@ const animateVictoryWinningLine = async() => {
         y2: [lineValue.end.y, centerY],
         duration: store.victoryAnimationDelayTime,
       });
-    }
-    let winCell = [];
-    let winProof = store.getWinLine();
-    let centerRow, centerColumn;
-    if (winProof.start.row == winProof.end.row){
-      centerRow = winProof.start.row;
-      centerColumn = (winProof.end.col - winProof.start.col) / 2;
-      for (let i = winProof.start.col; i <= winProof.end.col; ++i){
-        winCell.push({
-          row: winProof.start.row,
-          col: i
-        })
-      }
-    }
-    else if (winProof.start.col == winProof.end.col){
-      centerRow = (winProof.end.row - winProof.start.row) / 2;
-      centerColumn = winProof.start.col;
-      for (let i = winProof.start.row; i <= winProof.end.row; ++i){
-        winCell.push({
-          row: i,
-          col: winProof.start.col
-        })
-      }
-    }
-    else {
-      centerRow = (winProof.end.row - winProof.start.row) / 2;
-      centerColumn = (winProof.end.col - winProof.start.col) / 2;
-      for (let i = winProof.start.row, j = winProof.start.col; i <= winProof.end.row; ++i){
-        winCell.push({
-          row: i,
-          col: j++
-        })
-      }
-    }
-    const gridTableSize = gridRefs.value[centerRow * store.size + centerColumn + 1].getBoundingClientRect();
-    // need code animation all element fly to center
-    winCell.forEach((cell) => {
-      if (cell.row == centerRow && cell.col == centerColumn) return;
-      let el = gridRefs.value[cell.row * store.size + cell.col + 1].getIconElement();
-      let translateX = gridTableSize.x - el.getBoundingClientRect().x;
-      let translateY = gridTableSize.y - el.getBoundingClientRect().y;
-      tl.add({
-        targets: el,
-        translateX: translateX,
-        translateY: translateY,
-        duration: store.animateVictoryWinningLine,
-        offset: '+=0'
+    case Direction.DiagonalDownLeft:
+      return anime({
+        targets: winningLine.value,
+        x1: [lineValue.start.x, centerX],
+        x2: [lineValue.end.x, centerX],
+        y1: [lineValue.start.y, centerY],
+        y2: [lineValue.end.y, centerY],
+        duration: store.victoryAnimationDelayTime,
       });
-    })
-  });
+  }
 }
-const verticalLines = ref([200, 400]);
-const horizontalLines = ref([200, 400]);
+
+const animateGroupingMark = () => {
+  let winCell = [];
+  let winProof = store.getWinLine();
+  if (winProof.start.row == winProof.end.row){
+    for (let i = winProof.start.col; i <= winProof.end.col; ++i){
+      winCell.push({
+        row: winProof.start.row,
+        col: i
+      })
+    }
+  }
+  else if (winProof.start.col == winProof.end.col){
+    for (let i = winProof.start.row; i <= winProof.end.row; ++i){
+      winCell.push({
+        row: i,
+        col: winProof.start.col
+      })
+    }
+  }
+  else {
+    for (let i = winProof.start.row, j = winProof.start.col; i <= winProof.end.row; ++i){
+      winCell.push({
+        row: i,
+        col: winProof.start.col > winProof.end.col ? j-- : j++
+      })
+    }
+  }
+  let animations = [];
+  let centerRow = ~~(store.size / 2);
+  let centerColumn = ~~(store.size / 2);
+  const gridTableSize = gridRefs.value[centerRow * store.size + centerColumn + 1].getBoundingClientRect();
+  startPosition.value = {x: gridTableSize.x, y: gridTableSize.y};
+  // need code animation all element fly to center
+  winCell.forEach((cell) => {
+    if (cell.row == centerRow && cell.col == centerColumn) return;
+    let el = gridRefs.value[cell.row * store.size + cell.col + 1].getElement();
+    let translateX = gridTableSize.x - el.getBoundingClientRect().x;
+    let translateY = gridTableSize.y - el.getBoundingClientRect().y;
+    animations.push(anime({
+      targets: el,
+      translateX: translateX,
+      translateY: translateY,
+      duration: store.animateVictory,
+    }));
+  })
+  return animations;
+}
+
 </script>
 <template lang="">
   <div class="relative">
     <div class="w-full bg-teal-500 flex items-center justify-center py-6 px-48" :key="renderKey" v-show="!victoryShow">
       <div :class="[`grid gap-0`, gridClass, { 'pointer-events-none': disablePointerEvent }]" ref="gridTable">
-        <div :class="[`absolute grid`, gridClass]">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" :width="store.size * store.gridSize * 4" :height="store.size * store.gridSize * 4">
-            <line v-for="x in verticalLines" :key="x"
-              :x1="x"
-              y1="0"
-              :x2="x"
-              :y2="store.size * store.gridSize * 10"
-              :stroke="Color.Teal600"
-              stroke-width="16"
-            />
-            <line v-for="y in horizontalLines" :key="y"
-              x1="0"
-              :y1="y"
-              :x2="store.size * store.gridSize * 10"
-              :y2="y"
-              :stroke="Color.Teal600"
-              stroke-width="16"
-            />
-          </svg>
-        </div>
         <GridItem v-for="item in (store.size * store.size)"
           :key="item"
           :row="calculateRow(item - 1)"
@@ -249,12 +255,12 @@ const horizontalLines = ref([200, 400]);
           @aiMove="aiMove"
           @boardDisable="boardDisable"
           @victoryNotify="victoryNotify"/><!-- v-for is 1-indexed -->
-        <div class="absolute w-60 h-60" v-if="hasWinner">
+        <div :class="(`absolute w-` + store.size * store.gridSize + ` h-` + store.size * store.gridSize)" v-if="hasWinner">
           <svg
             ref="victorySvg"
             class="victory-svg"
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 300 300"
+            :viewBox="(`0 0 ` + store.size * 100 + ` ` + store.size * 100)"
           >
             <!-- Winning line will be dynamically created here -->
             <line
@@ -275,6 +281,7 @@ const horizontalLines = ref([200, 400]);
       v-if="victoryShow"
       class="w-full bg-teal-500"
       @refreshBoard="refreshBoard"
+      :startPosition="startPosition"
     />
   </div>
 </template>

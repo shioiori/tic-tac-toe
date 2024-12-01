@@ -19,8 +19,9 @@ export const useGameStore = defineStore('game', {
       oWinMatch: 0,
       ai: null,
       tickAnimationDelayTime: 200,
-      gridAnimationDelayTime: 200,
-      victoryAnimationDelayTime: 500,
+      gridAnimationDelayTime: 400,
+      victoryAnimationDelayTime: 400,
+      gridStroke: 4
     }
   },
   getters: {
@@ -77,20 +78,20 @@ export const useGameStore = defineStore('game', {
         case 2:
         case 3:
         case 4:
-        case 5:
-        case 6:
           this.gridSize = 20;
           this.iconTickSize = 48;
+          this.gridStroke = 8;
           break;
-        case 7:
-        case 8:
-        case 9:
+        case 5:
+        case 6:
           this.gridSize = 16;
           this.iconTickSize = 42;
+          this.gridStroke = 4;
           break;
-        default:
-          this.gridSize = 12;
-          this.iconTickSize = 30;
+        case 7:
+          this.gridSize = 8;
+          this.iconTickSize = 24;
+          this.gridStroke = 2;
           break;
       }
     },

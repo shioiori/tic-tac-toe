@@ -1,5 +1,5 @@
 <script setup>
-import { Level, Players } from '@/constants/enums';
+import { Level, Players, Result } from '@/constants/enums';
 import IconX from '../icons/IconX.vue';
 import IconO from '../icons/IconO.vue';
 import { useGameStore } from '@/stores/state';
@@ -36,6 +36,7 @@ const setHighlight = () => {
 
 const changePlayer = () => {
   if (store.level == Level.PlayAgainstAFriend) return;
+  if (store.result != Result.NotStart) return;
   store.changePlayer(props.player);
   // because X always goes first, if change need call AI to move
   emitter.emit("aiMove");

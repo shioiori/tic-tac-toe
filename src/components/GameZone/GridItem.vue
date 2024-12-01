@@ -67,7 +67,7 @@ const animateTickMark = async () => {
           targets: path,
           strokeDashoffset: [length, 0],
           duration: store.tickAnimationDelayTime,
-          easing: 'easeOutQuad',
+          easing: 'easeInQuad',
           complete: resolve
         });
       });
@@ -110,16 +110,16 @@ onMounted(() => {
     right = 0;
   }
   if (top) {
-    dynamicClass += `border-t-4 `;
+    dynamicClass += `border-t-${store.gridStroke} `;
   }
   if (bottom) {
-    dynamicClass += `border-b-4 `;
+    dynamicClass += `border-b-${store.gridStroke} `;
   }
   if (left) {
-    dynamicClass += `border-l-4 `;
+    dynamicClass += `border-l-${store.gridStroke} `;
   }
   if (right) {
-    dynamicClass += `border-r-4 `;
+    dynamicClass += `border-r-${store.gridStroke} `;
   }
   borderClass.value = dynamicClass;
   gridSizeClass.value = `w-${store.gridSize} h-${store.gridSize}`;
@@ -246,19 +246,25 @@ const getBoundingClientRect = () => {
   return tickMarkContainer.value.getBoundingClientRect();
 }
 
-//const getIconElement = () => iconElement.value.el.querySelectorAll('svg path');
-const getIconElement = () => tickMarkContainer.value
+const getIconElement = () => iconElement.value.el.querySelectorAll('svg path');
+const getElement = () => tickMarkContainer.value;
 
 defineExpose({
   tickMark,
   getBoundingClientRect,
   getIconElement,
+  getElement,
 })
 
 </script>
 <template lang="">
   <div :class="[`grid-item border-teal-600 flex justify-center items-center`,
-     gridSizeClass]"
+    borderClass, gridSizeClass]"
   @click="tickMark" ref="tickMarkContainer">
   </div>
 </template>
+<style>
+svg{
+  z-index: 999
+}
+</style>
