@@ -246,18 +246,19 @@ const getBoundingClientRect = () => {
   return tickMarkContainer.value.getBoundingClientRect();
 }
 
-const getIconElement = () => iconElement.value.el.querySelector('svg path');
+//const getIconElement = () => iconElement.value.el.querySelectorAll('svg path');
+const getIconElement = () => tickMarkContainer.value
 
 defineExpose({
   tickMark,
   getBoundingClientRect,
-  getIconElement
+  getIconElement,
 })
 
 </script>
 <template lang="">
   <div :class="[`grid-item border-teal-600 flex justify-center items-center`,
-    borderClass, gridSizeClass]"
+     gridSizeClass]"
   @click="tickMark" ref="tickMarkContainer">
   </div>
 </template>

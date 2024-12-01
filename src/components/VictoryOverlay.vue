@@ -1,14 +1,16 @@
 <template>
-  <div class="w-full h-60 py-6 px-48 bg-teal-500 text-center" @click="refreshBoard">
-    <div class="flex items-center justify-center iconContainer" ref="iconContainer">
-      <IconX v-if="store.currentPlayer == Players.X" :size="store.iconTickSize" :stroke="Color.LightGray"/>
-      <IconO :size="store.iconStatusSize" :stroke="Color.LightYellow" v-else/>
-    </div>
-    <div
-      ref="winnerText"
-      class="text-5xl font-bold flex justify-end" style="color:#545454"
-    >
-      {{ winnerMessage }}
+  <div class="w-full py-6 px-48 bg-teal-500 text-center" @click="refreshBoard">
+    <div :class="divSizeClass">
+      <div class="flex items-center justify-center iconContainer" ref="iconContainer">
+        <IconX v-if="store.currentPlayer == Players.X" :size="store.iconTickSize" :stroke="Color.LightGray"/>
+        <IconO :size="store.iconStatusSize" :stroke="Color.LightYellow" v-else/>
+      </div>
+      <div
+        ref="winnerText"
+        class="text-4xl font-bold text-center" style="color:#545454"
+      >
+        {{ winnerMessage }}
+      </div>
     </div>
   </div>
 </template>
@@ -26,28 +28,31 @@ const store = useGameStore();
 const iconContainer = ref(null)
 const winnerText = ref(null)
 const winnerMessage = ref('')
+const divSizeClass = ref('');
 
 const animateVictory = () => {
-  winnerMessage.value = store.result == Result.Draw ? "Draw!" : "Winner!";
+  winnerMessage.value = store.result == Result.Draw ? "DRAW!" : "WINNER!";
   const tl = anime.timeline({
     easing: 'easeInOutQuad'
   })
   tl.add({
     targets: iconContainer.value,
-    scale: [1, 3], // Zoom from original size to 3x
+    scale: [1, store.size], // Zoom from original size to 3x
     duration: 1000,
   })
   .add({
     targets: winnerText.value,
     opacity: [0, 1],
-    translateY: "6rem",
+    translateY: store.size * 2.5 + "rem",
     duration: store.victoryAnimationDelayTime,
-
-
   })
 }
 
-onMounted(() => animateVictory());
+onMounted(() => {
+  divSizeClass.value = `w-` + store.size * store.gridSize + ` h-` + store.size * store.gridSize;
+  animateVictory();
+});
+
 const emit = defineEmits(["refreshBoard"])
 
 const refreshBoard = async() => {

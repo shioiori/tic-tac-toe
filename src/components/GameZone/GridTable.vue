@@ -110,7 +110,7 @@ const calculateWinningLineCoordinates = () => {
     }
   }
 }
-
+const gridTable = ref(null);
 const winningLine = ref(null)
 const animateVictoryWinningLine = async() => {
   let direction = store.getWinLine().direction;
@@ -127,7 +127,7 @@ const animateVictoryWinningLine = async() => {
     // Animate winning line
     var tl = anime.timeline({
       easing: 'easeInOutQuad',
-      duration: 750
+      complete: resolve
     });
     tl.add({
       targets: winningLine.value,
@@ -162,38 +162,85 @@ const animateVictoryWinningLine = async() => {
         y1: [lineValue.start.y, centerY],
         y2: [lineValue.end.y, centerY],
         duration: store.victoryAnimationDelayTime,
-
       });
     }
+    let winCell = [];
     let winProof = store.getWinLine();
     let centerRow, centerColumn;
     if (winProof.start.row == winProof.end.row){
       centerRow = winProof.start.row;
       centerColumn = (winProof.end.col - winProof.start.col) / 2;
+      for (let i = winProof.start.col; i <= winProof.end.col; ++i){
+        winCell.push({
+          row: winProof.start.row,
+          col: i
+        })
+      }
     }
     else if (winProof.start.col == winProof.end.col){
       centerRow = (winProof.end.row - winProof.start.row) / 2;
       centerColumn = winProof.start.col;
+      for (let i = winProof.start.row; i <= winProof.end.row; ++i){
+        winCell.push({
+          row: i,
+          col: winProof.start.col
+        })
+      }
     }
     else {
       centerRow = (winProof.end.row - winProof.start.row) / 2;
       centerColumn = (winProof.end.col - winProof.start.col) / 2;
+      for (let i = winProof.start.row, j = winProof.start.col; i <= winProof.end.row; ++i){
+        winCell.push({
+          row: i,
+          col: j++
+        })
+      }
     }
-    console.log(gridRefs.value[centerRow * store.size + centerColumn + 1].getIconElement());
-
+    const gridTableSize = gridRefs.value[centerRow * store.size + centerColumn + 1].getBoundingClientRect();
     // need code animation all element fly to center
-    tl.add({
-      targets: gridRefs.value[centerRow * store.size + centerColumn + 1].getIconElement(),
-      complete: resolve
-    });
+    winCell.forEach((cell) => {
+      if (cell.row == centerRow && cell.col == centerColumn) return;
+      let el = gridRefs.value[cell.row * store.size + cell.col + 1].getIconElement();
+      let translateX = gridTableSize.x - el.getBoundingClientRect().x;
+      let translateY = gridTableSize.y - el.getBoundingClientRect().y;
+      tl.add({
+        targets: el,
+        translateX: translateX,
+        translateY: translateY,
+        duration: store.animateVictoryWinningLine,
+        offset: '+=0'
+      });
+    })
   });
 }
-
+const verticalLines = ref([200, 400]);
+const horizontalLines = ref([200, 400]);
 </script>
 <template lang="">
   <div class="relative">
     <div class="w-full bg-teal-500 flex items-center justify-center py-6 px-48" :key="renderKey" v-show="!victoryShow">
-      <div :class="[`grid gap-0`, gridClass, { 'pointer-events-none': disablePointerEvent }]">
+      <div :class="[`grid gap-0`, gridClass, { 'pointer-events-none': disablePointerEvent }]" ref="gridTable">
+        <div :class="[`absolute grid`, gridClass]">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" :width="store.size * store.gridSize * 4" :height="store.size * store.gridSize * 4">
+            <line v-for="x in verticalLines" :key="x"
+              :x1="x"
+              y1="0"
+              :x2="x"
+              :y2="store.size * store.gridSize * 10"
+              :stroke="Color.Teal600"
+              stroke-width="16"
+            />
+            <line v-for="y in horizontalLines" :key="y"
+              x1="0"
+              :y1="y"
+              :x2="store.size * store.gridSize * 10"
+              :y2="y"
+              :stroke="Color.Teal600"
+              stroke-width="16"
+            />
+          </svg>
+        </div>
         <GridItem v-for="item in (store.size * store.size)"
           :key="item"
           :row="calculateRow(item - 1)"
@@ -231,4 +278,5 @@ const animateVictoryWinningLine = async() => {
     />
   </div>
 </template>
-
+<style>
+</style>
