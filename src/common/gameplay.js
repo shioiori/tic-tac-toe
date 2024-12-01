@@ -1,17 +1,11 @@
+import { Direction } from "@/constants/direction";
 import { Result, Players } from "@/constants/enums";
-
-const directions = [
-  { dr: 0, dc: 1 },   // Horizontal
-  { dr: 1, dc: 0 },   // Vertical
-  { dr: 1, dc: 1 },   // Diagonal down-right
-  { dr: 1, dc: -1 }   // Diagonal down-left
-];
 
 export class CaroGame{
   constructor(size){
     this.size = size;
     this.init();
-    this.winLine = [];
+    this.winProof = null;
   }
 
   checkResult(player){
@@ -31,10 +25,14 @@ export class CaroGame{
   }
 
   hasWinCondition(row, col, player){
-    this.winLine.push({row: row, col: col});
     let condition = this.size < 5 ? this.size : 5;
-    for (const { dr, dc } of directions) {
+    for (const direction of Object.values(Direction)) {
       let count = 1;
+      this.winProof = {
+        direction: direction,
+      }
+      let dr = direction.dr;
+      let dc = direction.dc;
       for (let i = 1; i < condition; i++) {
         const nRow = row + dr * i;
         const nCol = col + dc * i;
@@ -43,7 +41,7 @@ export class CaroGame{
           this.grid[nRow][nCol] != player) {
           break;
         }
-        this.winLine.push({row: nRow, col: nCol});
+        this.winProof.end = {row: nRow, col: nCol};
         count++;
       }
       for (let i = 1; i < condition; i++) {
@@ -54,13 +52,14 @@ export class CaroGame{
           this.grid[nRow][nCol] != player) {
           break;
         }
-        this.winLine.push({row: nRow, col: nCol});
+        this.winProof.start = {row: nRow, col: nCol};
         count++;
       }
+      if (this.winProof.start == undefined) this.winProof.start = {row: row, col: col};
       if (count >= condition) return true;
-      else this.winLine = [];
+      else this.winProof = null;
     }
-    this.winLine = [];
+    this.winProof = null;
     return false;
   }
 

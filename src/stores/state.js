@@ -20,7 +20,7 @@ export const useGameStore = defineStore('game', {
       ai: null,
       tickAnimationDelayTime: 200,
       gridAnimationDelayTime: 200,
-      victoryAnimationDelayTime: 2000,
+      victoryAnimationDelayTime: 500,
     }
   },
   getters: {
@@ -100,9 +100,9 @@ export const useGameStore = defineStore('game', {
     },
     getWinLine(){
       if (this.endGame && this.result != Result.Draw){
-        return this.game.winLine;
+        return this.game.winProof;
       }
-      return [];
+      return null;
     }
   }
 })

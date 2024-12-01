@@ -14,6 +14,7 @@ const props = defineProps({
   row: Number,
   column: Number,
 })
+const iconElement = ref(null);
 const borderClass = ref(null);
 const gridSizeClass = ref(null);
 const emit = defineEmits(['aiMove', 'boardDisable', 'victoryNotify']);
@@ -37,6 +38,7 @@ const tickMarkHandle = async () => {
   const IconComponent = getIcon();
   if (tickMarkContainer.value) {
     render(IconComponent, tickMarkContainer.value);
+    iconElement.value = IconComponent;
     await animateTickMark(IconComponent);
   }
   store.checkResult();
@@ -244,9 +246,12 @@ const getBoundingClientRect = () => {
   return tickMarkContainer.value.getBoundingClientRect();
 }
 
+const getIconElement = () => iconElement.value.el.querySelector('svg path');
+
 defineExpose({
   tickMark,
-  getBoundingClientRect
+  getBoundingClientRect,
+  getIconElement
 })
 
 </script>

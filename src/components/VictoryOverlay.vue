@@ -1,136 +1,64 @@
 <template>
-  <div
-    class="w-full bg-teal-500 flex items-center justify-center"
-  >
+  <div class="w-full h-60 py-6 px-48 bg-teal-500 text-center" @click="refreshBoard">
+    <div class="flex items-center justify-center iconContainer" ref="iconContainer">
+      <IconX v-if="store.currentPlayer == Players.X" :size="store.iconTickSize" :stroke="Color.LightGray"/>
+      <IconO :size="store.iconStatusSize" :stroke="Color.LightYellow" v-else/>
+    </div>
     <div
-      ref="victoryContainer"
-      class="victory-container text-center"
+      ref="winnerText"
+      class="text-5xl font-bold flex justify-end" style="color:#545454"
     >
-      <svg
-        ref="victorySvg"
-        class="victory-svg"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 300 300"
-      >
-        <!-- Winning line will be dynamically created here -->
-        <line
-          ref="winningLine"
-          :x1="winningCoordinates.start.x"
-          :y1="winningCoordinates.start.y"
-          :x2="winningCoordinates.end.x"
-          :y2="winningCoordinates.end.y"
-          stroke="rgba(0, 255, 0, 0.7)"
-          stroke-width="10"
-          class="victory-line"
-        />
-      </svg>
-
-      <div
-        ref="winnerText"
-        class="winner-text opacity-0 mt-4 text-5xl font-bold"
-        :class="winnerTextClass"
-      >
-        {{ winnerMessage }}
-      </div>
+      {{ winnerMessage }}
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, defineProps, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import anime from 'animejs/lib/anime.es.js'
-import { Players } from '@/constants/enums';
+import { Players, Result } from '@/constants/enums';
 import { useGameStore } from '@/stores/state';
-
-const props = defineProps({
-  winningCoordinates: Object,
-  winner: Number
-})
-
+import { Color } from '@/constants/color';
+import IconX from './icons/IconX.vue';
+import IconO from './icons/IconO.vue';
 const store = useGameStore();
 
-const victoryContainer = ref(null)
-const victorySvg = ref(null)
-const winningLine = ref(null)
+const iconContainer = ref(null)
 const winnerText = ref(null)
-const restartButton = ref(null)
-
 const winnerMessage = ref('')
-const winnerTextClass = ref('')
-
-const calculateLineCoordinates = () => {
-  // This is a placeholder. You'll need to adjust based on your grid layout
-  // The coordinates should map to the start and end points of the winning line
-  const padding = 50 // Adjust based on your layout
-  props.winningCoordinates.start.x = 0;
-  props.winningCoordinates.start.y = 0;
-  // Example calculation - you'll need to customize this
-  // lineStart.x = padding
-  // lineStart.y = padding
-}
 
 const animateVictory = () => {
-  calculateLineCoordinates()
-
-  // Set winner message and color
-  winnerMessage.value = props.winner === Players.X
-    ? 'X Wins!'
-    : 'O Wins!'
-
-  winnerTextClass.value = props.winner === Players.X
-    ? 'text-red-500'
-    : 'text-blue-500'
-
-  // Victory animation timeline
+  winnerMessage.value = store.result == Result.Draw ? "Draw!" : "Winner!";
   const tl = anime.timeline({
     easing: 'easeInOutQuad'
   })
-
-  const length = Math.sqrt((props.winningCoordinates.start.x - props.winningCoordinates.end.x) * (props.winningCoordinates.start.x - props.winningCoordinates.end.x)
-    + (props.winningCoordinates.start.y - props.winningCoordinates.end.y) * (props.winningCoordinates.start.y - props.winningCoordinates.end.y));
-  console.log(length);
-
-  winningLine.value.style.strokeDasharray = length;
-  winningLine.value.style.strokeDashoffset = length;
-  // Animate winning line
   tl.add({
-    targets: winningLine.value,
-    strokeDashoffset: [length, 0],
-    duration: store.victoryAnimationDelayTime
+    targets: iconContainer.value,
+    scale: [1, 3], // Zoom from original size to 3x
+    duration: 1000,
   })
-  // Animate winner text
   .add({
     targets: winnerText.value,
     opacity: [0, 1],
-    translateY: [50, 0],
-    duration: store.victoryAnimationDelayTime
-  }, '-=200')
+    translateY: "6rem",
+    duration: store.victoryAnimationDelayTime,
 
-  // Animate restart button
-  .add({
-    targets: restartButton.value,
-    opacity: [0, 1],
-    translateY: [50, 0],
-    duration: store.victoryAnimationDelayTime
-  }, '-=300');
-  tl.play();
+
+  })
 }
 
 onMounted(() => animateVictory());
+const emit = defineEmits(["refreshBoard"])
+
+const refreshBoard = async() => {
+  await nextTick();
+  emit("refreshBoard");
+}
 
 </script>
 
 <style scoped>
-.victory-svg {
-  width: 300px;
-  height: 300px;
-}
-
-.winner-text {
-  text-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.restart-btn {
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+.iconContainer {
+  transform-origin: center top;
 }
 </style>
