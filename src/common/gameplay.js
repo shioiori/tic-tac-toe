@@ -9,7 +9,6 @@ export class CaroGame{
   }
 
   checkResult(player){
-    if (this.emptyCell == 0) return Result.Draw;
     for (let i = 0; i < this.size; ++i){
       for (let j = 0; j < this.size; ++j){
         if (this.grid[i][j] == player){
@@ -21,6 +20,7 @@ export class CaroGame{
         }
       }
     }
+    if (this.emptyCell == 0) return Result.Draw;
     return Result.InGame;
   }
 

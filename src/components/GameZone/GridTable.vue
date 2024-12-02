@@ -1,7 +1,7 @@
 <script setup>
 import { useGameStore } from '@/stores/state';
 import GridItem from './GridItem.vue';
-import { nextTick, onMounted } from 'vue';
+import { nextTick, onMounted, render } from 'vue';
 import { randomString } from '@/common/random';
 import { emitter } from '@/eventbus/mitt';
 import { ref } from 'vue';
@@ -136,11 +136,13 @@ const animateVictory = async() => {
     var tl = anime.timeline({
       easing: 'easeOutQuad',
       complete: () => {
-        Promise.all([...animateGroupingMark(),
-          animeteDisappearWinningLine()
-        ]).then(() => {
-          resolve();
-        })
+        const groupTimeline = anime.timeline({
+          complete: () => {
+            resolve();
+          }
+        });
+        //groupTimeline.add(animeteDisappearWinningLine());
+        //groupTimeline.add(animateGroupingMark());
       }
     });
     tl.add({
